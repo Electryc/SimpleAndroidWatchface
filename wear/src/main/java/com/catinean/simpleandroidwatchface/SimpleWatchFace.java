@@ -48,7 +48,7 @@ public class SimpleWatchFace {
         float timeYOffset = computeTimeYOffset(timeText, timePaint, bounds);
         canvas.drawText(timeText, timeXOffset, timeYOffset, timePaint);
 
-        String dateText = String.format(DATE_FORMAT, time.monthDay, time.month, time.year);
+        String dateText = String.format(DATE_FORMAT, time.monthDay, (time.month + 1), time.year);
         float dateXOffset = computeXOffset(dateText, datePaint, bounds);
         float dateYOffset = computeDateYOffset(dateText, datePaint);
         canvas.drawText(dateText, dateXOffset, timeYOffset + dateYOffset, datePaint);
