@@ -12,6 +12,8 @@ public class SimpleWatchFace {
     private static final String TIME_FORMAT_WITHOUT_SECONDS = "%02d.%02d";
     private static final String TIME_FORMAT_WITH_SECONDS = TIME_FORMAT_WITHOUT_SECONDS + ".%02d";
     private static final String DATE_FORMAT = "%02d.%02d.%d";
+    private static final int DATE_AND_TIME_DEFAULT_COLOUR = Color.WHITE;
+    private static final int BACKGROUND_DEFAULT_COLOUR = Color.BLACK;
 
     private final Paint timePaint;
     private final Paint datePaint;
@@ -20,20 +22,21 @@ public class SimpleWatchFace {
 
     private boolean shouldShowSeconds = true;
     private int backgroundColour;
+    private int dateAndTimeColour;
 
     public static SimpleWatchFace newInstance(Context context) {
         Paint timePaint = new Paint();
-        timePaint.setColor(Color.WHITE);
+        timePaint.setColor(DATE_AND_TIME_DEFAULT_COLOUR);
         timePaint.setTextSize(context.getResources().getDimension(R.dimen.time_size));
         timePaint.setAntiAlias(true);
 
         Paint datePaint = new Paint();
-        datePaint.setColor(Color.WHITE);
+        datePaint.setColor(DATE_AND_TIME_DEFAULT_COLOUR);
         datePaint.setTextSize(context.getResources().getDimension(R.dimen.date_size));
         datePaint.setAntiAlias(true);
 
         Paint backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.BLACK);
+        backgroundPaint.setColor(BACKGROUND_DEFAULT_COLOUR);
 
         return new SimpleWatchFace(timePaint, datePaint, backgroundPaint, new Time());
     }
@@ -85,9 +88,10 @@ public class SimpleWatchFace {
         datePaint.setAntiAlias(antiAlias);
     }
 
-    public void setColor(int color) {
-        timePaint.setColor(color);
-        datePaint.setColor(color);
+    public void updateDateAndTimeColourTo(int colour) {
+        dateAndTimeColour = colour;
+        timePaint.setColor(colour);
+        datePaint.setColor(colour);
     }
 
     public void updateTimeZoneWith(String timeZone) {
@@ -109,6 +113,16 @@ public class SimpleWatchFace {
     }
 
     public void updateBackgroundColourToDefault() {
-        backgroundPaint.setColor(Color.BLACK);
+        backgroundPaint.setColor(BACKGROUND_DEFAULT_COLOUR);
+    }
+
+    public void updateDateAndTimeColourToDefault() {
+        timePaint.setColor(DATE_AND_TIME_DEFAULT_COLOUR);
+        datePaint.setColor(DATE_AND_TIME_DEFAULT_COLOUR);
+    }
+
+    public void restoreDateAndTimeColour() {
+        timePaint.setColor(dateAndTimeColour);
+        datePaint.setColor(dateAndTimeColour);
     }
 }

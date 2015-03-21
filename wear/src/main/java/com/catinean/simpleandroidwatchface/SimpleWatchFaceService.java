@@ -42,8 +42,9 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
         private static final String ACTION_TIME_ZONE = "time-zone";
-        private static final String PATH = "/watch_face_config/digital";
+        private static final String PATH = "/simple_watch_face_config";
         private static final String KEY_BACKGROUND_COLOUR = "KEY_BACKGROUND_COLOUR";
+        private static final String KEY_DATE_TIME_COLOUR = "KEY_DATE_TIME_COLOUR";
         private static final String TAG = "SimpleEngine";
 
         private SimpleWatchFace watchFace;
@@ -114,6 +115,13 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             startTimerIfNecessary();
         }
 
+        private void releaseGoogleApiClient() {
+            if (googleApiClient != null && googleApiClient.isConnected()) {
+                Wearable.DataApi.removeListener(googleApiClient, onDataChangedListener);
+                googleApiClient.disconnect();
+            }
+        }
+
         private void unregisterTimeZoneReceiver() {
             unregisterReceiver(timeZoneChangedReceiver);
         }
@@ -148,13 +156,14 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
             watchFace.setAntiAlias(!inAmbientMode);
-            watchFace.setColor(inAmbientMode ? Color.GRAY : Color.WHITE);
             watchFace.setShowSeconds(!isInAmbientMode());
 
             if (inAmbientMode) {
                 watchFace.updateBackgroundColourToDefault();
+                watchFace.updateDateAndTimeColourToDefault();
             } else {
                 watchFace.restoreBackgroundColour();
+                watchFace.restoreDateAndTimeColour();
             }
 
             invalidate();
@@ -176,12 +185,7 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
                 for (DataEvent event : dataEvents) {
                     if (event.getType() == DataEvent.TYPE_CHANGED) {
                         DataItem item = event.getDataItem();
-                        if (PATH.equals(item.getUri().getPath())) {
-                            DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                            String backgroundColour = dataMap.getString(KEY_BACKGROUND_COLOUR);
-                            watchFace.updateBackgroundColourTo(Color.parseColor(backgroundColour));
-                            invalidateIfNecessary();
-                        }
+                        processConfigurationFor(item);
                     }
                 }
 
@@ -189,16 +193,27 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             }
         };
 
+        private void processConfigurationFor(DataItem item) {
+            if (PATH.equals(item.getUri().getPath())) {
+                DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                if (dataMap.containsKey(KEY_BACKGROUND_COLOUR)) {
+                    String backgroundColour = dataMap.getString(KEY_BACKGROUND_COLOUR);
+                    watchFace.updateBackgroundColourTo(Color.parseColor(backgroundColour));
+                }
+
+                if (dataMap.containsKey(KEY_DATE_TIME_COLOUR)) {
+                    String timeColour = dataMap.getString(KEY_DATE_TIME_COLOUR);
+                    watchFace.updateDateAndTimeColourTo(Color.parseColor(timeColour));
+                }
+                invalidateIfNecessary();
+            }
+        }
+
         private final ResultCallback<DataItemBuffer> onConnectedResultCallback = new ResultCallback<DataItemBuffer>() {
             @Override
             public void onResult(DataItemBuffer dataItems) {
                 for (DataItem item : dataItems) {
-                    if (PATH.equals(item.getUri().getPath())) {
-                        DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                        String colour = dataMap.getString(KEY_BACKGROUND_COLOUR);
-                        watchFace.updateBackgroundColourTo(Color.parseColor(colour));
-                        invalidateIfNecessary();
-                    }
+                    processConfigurationFor(item);
                 }
 
                 dataItems.release();
@@ -221,13 +236,6 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             releaseGoogleApiClient();
 
             super.onDestroy();
-        }
-
-        private void releaseGoogleApiClient() {
-            if (googleApiClient != null && googleApiClient.isConnected()) {
-                Wearable.DataApi.removeListener(googleApiClient, onDataChangedListener);
-                googleApiClient.disconnect();
-            }
         }
     }
 }
