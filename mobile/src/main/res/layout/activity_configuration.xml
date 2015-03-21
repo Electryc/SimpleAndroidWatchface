@@ -23,12 +23,11 @@
       android:textColor="@android:color/black"
       android:text="Background colour" />
 
-    <ImageView
+    <View
+      android:id="@+id/configuration_background_colour_preview"
       android:layout_width="20dp"
       android:layout_height="20dp"
-      android:contentDescription="@null"
-      android:layout_alignParentEnd="true"
-      android:src="@android:color/holo_red_dark" />
+      android:layout_alignParentEnd="true" />
 
   </RelativeLayout>
 
@@ -48,12 +47,11 @@
       android:textColor="@android:color/black"
       android:text="Time colour" />
 
-    <ImageView
+    <View
+      android:id="@+id/configuration_date_and_time_colour_preview"
       android:layout_width="20dp"
       android:layout_height="20dp"
-      android:contentDescription="@null"
-      android:layout_alignParentEnd="true"
-      android:src="@android:color/holo_red_dark" />
+      android:layout_alignParentEnd="true" />
 
   </RelativeLayout>
 

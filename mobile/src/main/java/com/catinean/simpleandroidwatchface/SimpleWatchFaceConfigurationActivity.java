@@ -1,6 +1,7 @@
 package com.catinean.simpleandroidwatchface;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,11 +16,17 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String PATH = "/watch_face_config/digital";
+    private static final String PATH = "/simple_watch_face_config";
     private static final String TAG = "SimpleWatchface";
     private static final String KEY_BACKGROUND_COLOUR = "KEY_BACKGROUND_COLOUR";
-    private static final String KEY_TIME_COLOUR = "KEY_TIME_COLOUR";
+    private static final String KEY_DATE_TIME_COLOUR = "KEY_DATE_TIME_COLOUR";
+    private static final String TAG_BACKGROUND_COLOUR_CHOOSER = "background_chooser";
+    private static final String TAG_DATE_AND_TIME_COLOUR_CHOOSER = "date_time_chooser";
+
     private GoogleApiClient googleApiClient;
+    private View backgroundColourImagePreview;
+    private View dateAndTimeColourImagePreview;
+    private WatchConfigurationPreferences watchConfigurationPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,14 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
                         .show(getFragmentManager(), TAG_DATE_AND_TIME_COLOUR_CHOOSER);
             }
         });
+
+        backgroundColourImagePreview = findViewById(R.id.configuration_background_colour_preview);
+        dateAndTimeColourImagePreview = findViewById(R.id.configuration_date_and_time_colour_preview);
+
+        watchConfigurationPreferences = WatchConfigurationPreferences.newInstance(this);
+
+        backgroundColourImagePreview.setBackgroundColor(watchConfigurationPreferences.getBackgroundColour());
+        dateAndTimeColourImagePreview.setBackgroundColor(watchConfigurationPreferences.getDateAndTimeColour());
     }
 
     @Override
@@ -56,24 +71,26 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
     }
 
     @Override
-    protected void onStop() {
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
-        }
-        super.onStop();
-    }
-
-    @Override
     public void onColourSelected(String colour, String tag) {
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(PATH);
-        putDataMapReq.getDataMap().putString("background_chooser".equals(tag) ? KEY_BACKGROUND_COLOUR : KEY_TIME_COLOUR, colour);
+
+        if (TAG_BACKGROUND_COLOUR_CHOOSER.equals(tag)) {
+            backgroundColourImagePreview.setBackgroundColor(Color.parseColor(colour));
+            watchConfigurationPreferences.setBackgroundColour(Color.parseColor(colour));
+            putDataMapReq.getDataMap().putString(KEY_BACKGROUND_COLOUR, colour);
+        } else {
+            dateAndTimeColourImagePreview.setBackgroundColor(Color.parseColor(colour));
+            watchConfigurationPreferences.setDateAndTimeColour(Color.parseColor(colour));
+            putDataMapReq.getDataMap().putString(KEY_DATE_TIME_COLOUR, colour);
+        }
+
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         Wearable.DataApi.putDataItem(googleApiClient, putDataReq);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e(TAG, "onConnected");
+        Log.d(TAG, "onConnected");
     }
 
     @Override
@@ -84,5 +101,13 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "onConnectionFailed");
+    }
+
+    @Override
+    protected void onStop() {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+        super.onStop();
     }
 }
