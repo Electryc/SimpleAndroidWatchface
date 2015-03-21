@@ -7,11 +7,25 @@ import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.util.Log;
 import android.view.SurfaceHolder;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataItemBuffer;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,12 +38,17 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
         return new SimpleEngine();
     }
 
-    private class SimpleEngine extends CanvasWatchFaceService.Engine {
+    private class SimpleEngine extends CanvasWatchFaceService.Engine implements
+            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
         private static final String ACTION_TIME_ZONE = "time-zone";
+        private static final String PATH = "/watch_face_config/digital";
+        private static final String KEY_BACKGROUND_COLOUR = "KEY_BACKGROUND_COLOUR";
+        private static final String TAG = "SimpleEngine";
 
         private SimpleWatchFace watchFace;
         private Handler timeTick;
+        private GoogleApiClient googleApiClient;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -46,6 +65,11 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             startTimerIfNecessary();
 
             watchFace = SimpleWatchFace.newInstance(SimpleWatchFaceService.this);
+            googleApiClient = new GoogleApiClient.Builder(SimpleWatchFaceService.this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
         }
 
         private void startTimerIfNecessary() {
@@ -81,8 +105,10 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
             if (visible) {
                 registerTimeZoneReceiver();
+                googleApiClient.connect();
             } else {
                 unregisterTimeZoneReceiver();
+                releaseGoogleApiClient();
             }
 
             startTimerIfNecessary();
@@ -124,15 +150,84 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             watchFace.setAntiAlias(!inAmbientMode);
             watchFace.setColor(inAmbientMode ? Color.GRAY : Color.WHITE);
             watchFace.setShowSeconds(!isInAmbientMode());
+
+            if (inAmbientMode) {
+                watchFace.updateBackgroundColourToDefault();
+            } else {
+                watchFace.restoreBackgroundColour();
+            }
+
             invalidate();
 
             startTimerIfNecessary();
         }
 
         @Override
+        public void onConnected(Bundle bundle) {
+            Log.d(TAG, "connected GoogleAPI");
+
+            Wearable.DataApi.addListener(googleApiClient, onDataChangedListener);
+            Wearable.DataApi.getDataItems(googleApiClient).setResultCallback(onConnectedResultCallback);
+        }
+
+        private final DataApi.DataListener onDataChangedListener = new DataApi.DataListener() {
+            @Override
+            public void onDataChanged(DataEventBuffer dataEvents) {
+                for (DataEvent event : dataEvents) {
+                    if (event.getType() == DataEvent.TYPE_CHANGED) {
+                        DataItem item = event.getDataItem();
+                        if (PATH.equals(item.getUri().getPath())) {
+                            DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                            String backgroundColour = dataMap.getString(KEY_BACKGROUND_COLOUR);
+                            watchFace.updateBackgroundColourTo(Color.parseColor(backgroundColour));
+                            invalidateIfNecessary();
+                        }
+                    }
+                }
+
+                dataEvents.release();
+            }
+        };
+
+        private final ResultCallback<DataItemBuffer> onConnectedResultCallback = new ResultCallback<DataItemBuffer>() {
+            @Override
+            public void onResult(DataItemBuffer dataItems) {
+                for (DataItem item : dataItems) {
+                    if (PATH.equals(item.getUri().getPath())) {
+                        DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                        String colour = dataMap.getString(KEY_BACKGROUND_COLOUR);
+                        watchFace.updateBackgroundColourTo(Color.parseColor(colour));
+                        invalidateIfNecessary();
+                    }
+                }
+
+                dataItems.release();
+            }
+        };
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            Log.e(TAG, "suspended GoogleAPI");
+        }
+
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            Log.e(TAG, "connectionFailed GoogleAPI");
+        }
+
+        @Override
         public void onDestroy() {
             timeTick.removeCallbacks(timeRunnable);
+            releaseGoogleApiClient();
+
             super.onDestroy();
+        }
+
+        private void releaseGoogleApiClient() {
+            if (googleApiClient != null && googleApiClient.isConnected()) {
+                Wearable.DataApi.removeListener(googleApiClient, onDataChangedListener);
+                googleApiClient.disconnect();
+            }
         }
     }
 }

@@ -15,9 +15,11 @@ public class SimpleWatchFace {
 
     private final Paint timePaint;
     private final Paint datePaint;
+    private final Paint backgroundPaint;
     private final Time time;
 
     private boolean shouldShowSeconds = true;
+    private int backgroundColour;
 
     public static SimpleWatchFace newInstance(Context context) {
         Paint timePaint = new Paint();
@@ -30,18 +32,22 @@ public class SimpleWatchFace {
         datePaint.setTextSize(context.getResources().getDimension(R.dimen.date_size));
         datePaint.setAntiAlias(true);
 
-        return new SimpleWatchFace(timePaint, datePaint, new Time());
+        Paint backgroundPaint = new Paint();
+        backgroundPaint.setColor(Color.BLACK);
+
+        return new SimpleWatchFace(timePaint, datePaint, backgroundPaint, new Time());
     }
 
-    SimpleWatchFace(Paint timePaint, Paint datePaint, Time time) {
+    SimpleWatchFace(Paint timePaint, Paint datePaint, Paint backgroundPaint, Time time) {
         this.timePaint = timePaint;
         this.datePaint = datePaint;
+        this.backgroundPaint = backgroundPaint;
         this.time = time;
     }
 
     public void draw(Canvas canvas, Rect bounds) {
         time.setToNow();
-        canvas.drawColor(Color.BLACK);
+        canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
 
         String timeText = String.format(shouldShowSeconds ? TIME_FORMAT_WITH_SECONDS : TIME_FORMAT_WITHOUT_SECONDS, time.hour, time.minute, time.second);
         float timeXOffset = computeXOffset(timeText, timePaint, bounds);
@@ -91,5 +97,18 @@ public class SimpleWatchFace {
 
     public void setShowSeconds(boolean showSeconds) {
         shouldShowSeconds = showSeconds;
+    }
+
+    public void updateBackgroundColourTo(int colour) {
+        backgroundColour = colour;
+        backgroundPaint.setColor(colour);
+    }
+
+    public void restoreBackgroundColour() {
+        backgroundPaint.setColor(backgroundColour);
+    }
+
+    public void updateBackgroundColourToDefault() {
+        backgroundPaint.setColor(Color.BLACK);
     }
 }
