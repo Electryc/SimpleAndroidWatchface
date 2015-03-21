@@ -35,14 +35,16 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
         findViewById(R.id.configuration_background_colour).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ColourChooserDialog().show(getFragmentManager(), "background_chooser");
+                ColourChooserDialog.newInstance(getString(R.string.pick_background_colour))
+                        .show(getFragmentManager(), TAG_BACKGROUND_COLOUR_CHOOSER);
             }
         });
 
         findViewById(R.id.configuration_time_colour).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ColourChooserDialog().show(getFragmentManager(), "time_chooser");
+                ColourChooserDialog.newInstance(getString(R.string.pick_date_time_colour))
+                        .show(getFragmentManager(), TAG_DATE_AND_TIME_COLOUR_CHOOSER);
             }
         });
     }

@@ -9,7 +9,16 @@ import android.os.Bundle;
 
 public class ColourChooserDialog extends DialogFragment {
 
+    private static final String ARG_TITLE = "ARG_TITLE";
     private Listener colourSelectedListener;
+
+    public static ColourChooserDialog newInstance(String dialogTitle) {
+        Bundle arguments = new Bundle();
+        arguments.putString(ARG_TITLE, dialogTitle);
+        ColourChooserDialog dialog = new ColourChooserDialog();
+        dialog.setArguments(arguments);
+        return dialog;
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -19,8 +28,9 @@ public class ColourChooserDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        String title = getArguments().getString(ARG_TITLE);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.pick_background_colour)
+        builder.setTitle(title)
                 .setItems(R.array.colors_array, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String[] colours = getResources().getStringArray(R.array.colors_array);
