@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name">SimpleWatchface</string>
+  <string name="pick_background_colour">Pick background colour</string>
 </resources>

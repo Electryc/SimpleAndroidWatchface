@@ -2,11 +2,60 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent"
+  android:divider="@drawable/delimiter"
+  android:showDividers="middle"
+  android:padding="16dp">
 
-  <TextView
-    android:layout_width="wrap_content"
+  <RelativeLayout
+    android:id="@+id/configuration_background_colour"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="Config" />
+    android:gravity="center_vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="18sp"
+      android:layout_alignParentStart="true"
+      android:textColor="@android:color/black"
+      android:text="Background colour" />
+
+    <ImageView
+      android:layout_width="20dp"
+      android:layout_height="20dp"
+      android:contentDescription="@null"
+      android:layout_alignParentEnd="true"
+      android:src="@android:color/holo_red_dark" />
+
+  </RelativeLayout>
+
+  <RelativeLayout
+    android:id="@+id/configuration_time_colour"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="18sp"
+      android:layout_alignParentStart="true"
+      android:textColor="@android:color/black"
+      android:text="Time colour" />
+
+    <ImageView
+      android:layout_width="20dp"
+      android:layout_height="20dp"
+      android:contentDescription="@null"
+      android:layout_alignParentEnd="true"
+      android:src="@android:color/holo_red_dark" />
+
+  </RelativeLayout>
+
 
 </LinearLayout>
