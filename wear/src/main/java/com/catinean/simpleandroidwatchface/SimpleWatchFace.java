@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.format.Time;
-import android.util.Log;
 
 public class SimpleWatchFace {
 
