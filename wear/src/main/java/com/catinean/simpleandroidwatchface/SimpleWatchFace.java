@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.format.Time;
+import android.util.Log;
 
 public class SimpleWatchFace {
 
@@ -21,8 +22,8 @@ public class SimpleWatchFace {
     private final Time time;
 
     private boolean shouldShowSeconds = true;
-    private int backgroundColour;
-    private int dateAndTimeColour;
+    private int backgroundColour = BACKGROUND_DEFAULT_COLOUR;
+    private int dateAndTimeColour = DATE_AND_TIME_DEFAULT_COLOUR;
 
     public static SimpleWatchFace newInstance(Context context) {
         Paint timePaint = new Paint();
