@@ -1,9 +1,11 @@
 package com.catinean.simpleandroidwatchface;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -12,7 +14,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
-public class SimpleWatchFaceConfigurationActivity extends Activity implements ColourChooserDialog.Listener,
+public class SimpleWatchFaceConfigurationActivity extends ActionBarActivity implements ColourChooserDialog.Listener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -32,6 +34,10 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuration);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -68,6 +74,16 @@ public class SimpleWatchFaceConfigurationActivity extends Activity implements Co
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

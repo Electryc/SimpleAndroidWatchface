@@ -12,7 +12,8 @@
 
     <activity
       android:name="com.catinean.simpleandroidwatchface.SimpleWatchFaceConfigurationActivity"
-      android:label="@string/app_name">
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme">
       <intent-filter>
         <action android:name="com.catinean.simpleandroidwatchface.CONFIG_DIGITAL" />
 
