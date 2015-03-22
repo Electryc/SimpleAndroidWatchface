@@ -190,6 +190,7 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
                 }
 
                 dataEvents.release();
+                invalidateIfNecessary();
             }
         };
 
@@ -205,7 +206,6 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
                     String timeColour = dataMap.getString(KEY_DATE_TIME_COLOUR);
                     watchFace.updateDateAndTimeColourTo(Color.parseColor(timeColour));
                 }
-                invalidateIfNecessary();
             }
         }
 
@@ -217,6 +217,7 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
                 }
 
                 dataItems.release();
+                invalidateIfNecessary();
             }
         };
 
