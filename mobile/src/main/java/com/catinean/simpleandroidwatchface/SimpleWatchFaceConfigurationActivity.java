@@ -18,10 +18,7 @@ public class SimpleWatchFaceConfigurationActivity extends ActionBarActivity impl
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String PATH = "/simple_watch_face_config";
     private static final String TAG = "SimpleWatchface";
-    private static final String KEY_BACKGROUND_COLOUR = "KEY_BACKGROUND_COLOUR";
-    private static final String KEY_DATE_TIME_COLOUR = "KEY_DATE_TIME_COLOUR";
     private static final String TAG_BACKGROUND_COLOUR_CHOOSER = "background_chooser";
     private static final String TAG_DATE_AND_TIME_COLOUR_CHOOSER = "date_time_chooser";
 
@@ -88,16 +85,16 @@ public class SimpleWatchFaceConfigurationActivity extends ActionBarActivity impl
 
     @Override
     public void onColourSelected(String colour, String tag) {
-        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(PATH);
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WatchfaceSyncCommons.PATH);
 
         if (TAG_BACKGROUND_COLOUR_CHOOSER.equals(tag)) {
             backgroundColourImagePreview.setBackgroundColor(Color.parseColor(colour));
             watchConfigurationPreferences.setBackgroundColour(Color.parseColor(colour));
-            putDataMapReq.getDataMap().putString(KEY_BACKGROUND_COLOUR, colour);
+            putDataMapReq.getDataMap().putString(WatchfaceSyncCommons.KEY_BACKGROUND_COLOUR, colour);
         } else {
             dateAndTimeColourImagePreview.setBackgroundColor(Color.parseColor(colour));
             watchConfigurationPreferences.setDateAndTimeColour(Color.parseColor(colour));
-            putDataMapReq.getDataMap().putString(KEY_DATE_TIME_COLOUR, colour);
+            putDataMapReq.getDataMap().putString(WatchfaceSyncCommons.KEY_DATE_TIME_COLOUR, colour);
         }
 
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();

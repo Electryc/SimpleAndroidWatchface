@@ -42,9 +42,6 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
         private static final String ACTION_TIME_ZONE = "time-zone";
-        private static final String PATH = "/simple_watch_face_config";
-        private static final String KEY_BACKGROUND_COLOUR = "KEY_BACKGROUND_COLOUR";
-        private static final String KEY_DATE_TIME_COLOUR = "KEY_DATE_TIME_COLOUR";
         private static final String TAG = "SimpleEngine";
 
         private SimpleWatchFace watchFace;
@@ -195,15 +192,15 @@ public class SimpleWatchFaceService extends CanvasWatchFaceService {
         };
 
         private void processConfigurationFor(DataItem item) {
-            if (PATH.equals(item.getUri().getPath())) {
+            if (WatchfaceSyncCommons.PATH.equals(item.getUri().getPath())) {
                 DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                if (dataMap.containsKey(KEY_BACKGROUND_COLOUR)) {
-                    String backgroundColour = dataMap.getString(KEY_BACKGROUND_COLOUR);
+                if (dataMap.containsKey(WatchfaceSyncCommons.KEY_BACKGROUND_COLOUR)) {
+                    String backgroundColour = dataMap.getString(WatchfaceSyncCommons.KEY_BACKGROUND_COLOUR);
                     watchFace.updateBackgroundColourTo(Color.parseColor(backgroundColour));
                 }
 
-                if (dataMap.containsKey(KEY_DATE_TIME_COLOUR)) {
-                    String timeColour = dataMap.getString(KEY_DATE_TIME_COLOUR);
+                if (dataMap.containsKey(WatchfaceSyncCommons.KEY_DATE_TIME_COLOUR)) {
+                    String timeColour = dataMap.getString(WatchfaceSyncCommons.KEY_DATE_TIME_COLOUR);
                     watchFace.updateDateAndTimeColourTo(Color.parseColor(timeColour));
                 }
             }
